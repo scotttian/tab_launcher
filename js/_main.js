@@ -3,13 +3,47 @@ $(document).ready(function(){
   updateNews();
   setInterval(updateClock,1000);
   setInterval(updateNews,60000);
+
+  var appStorage = new appStorageController();
+  var contentManager = new contentManagerController(appStorage);
+  
+  contentManager.showHeadLine();
+
+  var editMode = false;
+
+  $("#headLine").keydown(function(event){
+    if(event.keyCode == 13){
+      event.preventDefault();
+      return false;
+    }
+  });
+  $("#headLine").keyup(function(event){
+    if(event.keyCode == 13){
+        //event.preventDefault();
+        //document.execCommand('insertHTML', false, '<br><br>');
+        var new_content = $("#headLine").text();
+        appStorage.setHeadLine(new_content);
+        $(this).blur();
+        window.getSelection().removeAllRanges();
+        return false;
+    }
+  });
+  $("#headLine").blur(function(){
+    contentManager.showHeadLine();
+  });
 })
+
+var contentManagerController = function(appStorage){
+  this.showHeadLine = function(){ 
+    $("#headLine").html(appStorage.getHeadLine()); 
+  }
+}
 
 var updateClock = function(){
   var now = new Date(Date.now());
   var hours =  now.getHours()<10 ? "0"+now.getHours(): now.getHours();
   var minutes = now.getMinutes()<10 ? "0"+now.getMinutes(): now.getMinutes();
-  var formattedTime = hours +" : "+ minutes;
+  var formattedTime = hours +":"+ minutes;
   $(".time").html(formattedTime);
 };
 
@@ -39,6 +73,22 @@ var updateNews = function(){
     })
     $(".news").html(news_html);
   }); 
+}
+
+
+var appStorageController = function(){
+  var myStorage = localStorage;
+  if(myStorage.getItem("headLine")===null || myStorage.getItem("headLine").length===0){
+    myStorage.setItem("headLine", "Another day in paradise");
+  }  
+
+  this.setHeadLine = function(headline){
+    myStorage.setItem("headLine",headline);
+  }
+  
+  this.getHeadLine = function(){ 
+    return myStorage.getItem("headLine");
+  }
 }
 
 

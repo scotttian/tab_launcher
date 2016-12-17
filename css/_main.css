@@ -19,6 +19,11 @@ html,body{
   background-repeat:no-repeat;
 }
 
+#headLine:focus{
+  outline:0;
+}
+
+
 .center{
   color:white;
   width:100%;
@@ -54,4 +59,12 @@ html,body{
 .news_content{
   color:white;
   text-decoration:none;
+}
+
+.thinkPad{
+  width:30%;
+  position:absolute;
+  top:0px;
+  right:0px;
+  
 }
