@@ -8,18 +8,26 @@ $(document).ready(function(){
   var contentManager = new contentManagerController(appStorage);
   
   contentManager.showHeadLine();
-
+  contentManager.showThinkPadList();
+  
   var editMode = false;
+  $("#thinkPadInputField").keydown(function(event){
+    if(event.keyCode === 13){
+      event.preventDefault();
+      var thinkPadContent = $("#thinkPadInputField").text();
+      $(this).blur();
+      window.getSelection().removeAllRanges();
+      contentManager.addToThinkPadList(thinkPadContent);
+      $("#thinkPadInputField").html("");
+      return false;
+    }  
+    }
+  );
 
+  
   $("#headLine").keydown(function(event){
     if(event.keyCode == 13){
-      event.preventDefault();
-      return false;
-    }
-  });
-  $("#headLine").keyup(function(event){
-    if(event.keyCode == 13){
-        //event.preventDefault();
+        event.preventDefault();
         //document.execCommand('insertHTML', false, '<br><br>');
         var new_content = $("#headLine").text();
         appStorage.setHeadLine(new_content);
@@ -33,12 +41,26 @@ $(document).ready(function(){
   });
 })
 
+
+//Controllers are below
 var contentManagerController = function(appStorage){
   this.showHeadLine = function(){ 
     $("#headLine").html(appStorage.getHeadLine()); 
   }
+
+  this.showThinkPadList = function(){
+    var thinkPadItems = appStorage.getThinkPadItems();
+    console.log(thinkPadItems);
+    //thinkPadItems.forEach(function(e){
+    //  this.addToThinkPadList(e)
+   // })
+  }
+  this.addToThinkPadList = function(content){
+    $("#thinkPadList").append("<div class='thinkPadListItem'>"+content+"</div>");
+  }
 }
 
+//Ohter contollers 
 var updateClock = function(){
   var now = new Date(Date.now());
   var hours =  now.getHours()<10 ? "0"+now.getHours(): now.getHours();
@@ -76,18 +98,37 @@ var updateNews = function(){
 }
 
 
+// Storage Controller 
 var appStorageController = function(){
   var myStorage = localStorage;
   if(myStorage.getItem("headLine")===null || myStorage.getItem("headLine").length===0){
     myStorage.setItem("headLine", "Another day in paradise");
   }  
-
+  
+  if(myStorage.getItem("thinkPadItems")===null || myStorage.getItem("thinkPadItems").length===0){
+    myStorage.setItem("thinkPadItems", "hello");
+  }  
+  
+  
   this.setHeadLine = function(headline){
     myStorage.setItem("headLine",headline);
   }
   
   this.getHeadLine = function(){ 
     return myStorage.getItem("headLine");
+  }
+  
+  this.setThinkPad = function(list){
+    myStorage.setItem("thinkPadItems",list);
+  }
+  
+  this.addThinkPadItem = function(content){
+    var itemList = this.getThinkPadItems();
+    itiemList.push(content);
+    this.setThinkPad(itemList);
+  }
+  this.getThinkPadItems = function(){
+    return myStorage.getItem("thinkPadItems");
   }
 }
 
